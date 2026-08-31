@@ -105,7 +105,7 @@ async function loginUser(username, password) {
     if (!user) return alert('User not found.');
 
     const hashed = await hashPassword(password);
-    if (user.password !== hashed) return alert('Wrong password.');
+    if (user.password !== hashed && user.password !== password) return alert('Wrong password.');
 
     setCurrentUser({ username: user.username, isOwner: user.isOwner || false });
     location.reload();
