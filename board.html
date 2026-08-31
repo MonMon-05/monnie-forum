@@ -110,6 +110,15 @@
             loadBoardPosts();
         }
 
+        async function deleteBoardPost(postId) {
+            if (!isAdmin()) return alert('Admin only.');
+            if (!confirm('Delete this post?')) return;
+            const posts = await fetchBin(CONFIG.boardBinId);
+            const filtered = posts.filter(p => p.id !== postId);
+            await saveBin(CONFIG.boardBinId, filtered);
+            loadBoardPosts();
+        }
+
         async function loadBoardPosts() {
             const posts = await fetchBin(CONFIG.boardBinId);
             const container = document.getElementById('board-list');
@@ -121,7 +130,10 @@
 
             container.innerHTML = posts.map(p => `
                 <div class="post-card">
-                    <h3>${escapeHtml(p.title)}</h3>
+                    <div class="post-header">
+                        <h3>${escapeHtml(p.title)}</h3>
+                        ${isAdmin() ? `<button class="delete-btn" onclick="deleteBoardPost(${p.id})">x</button>` : ''}
+                    </div>
                     ${p.tag ? `<span class="tag">${escapeHtml(p.tag)}</span>` : ''}
                     <p class="post-body">${escapeHtml(p.body)}</p>
                     <p class="post-meta">${escapeHtml(p.author)} &mdash; ${p.date}</p>
