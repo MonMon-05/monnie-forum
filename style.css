@@ -1,0 +1,346 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --pink-light: #fce4ec;
+    --pink-mid: #f8bbd0;
+    --pink-dark: #f48fb1;
+    --pink-accent: #ec407a;
+    --text-dark: #4a3347;
+    --text-mid: #6d5268;
+    --text-light: #9c7a95;
+    --white: #fff9fb;
+    --border: #f3c4d8;
+    --shadow: rgba(236, 64, 122, 0.1);
+}
+
+body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--pink-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    padding: 40px 0 20px;
+    border-bottom: 2px solid var(--pink-mid);
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 2em;
+    color: var(--pink-accent);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.tagline {
+    color: var(--text-light);
+    font-style: italic;
+    margin-top: 5px;
+    font-size: 0.95em;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-mid);
+    padding: 8px 20px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    font-size: 0.9em;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background-color: var(--pink-dark);
+    color: var(--white);
+    border-color: var(--pink-dark);
+}
+
+main {
+    min-height: 400px;
+}
+
+h2 {
+    color: var(--pink-accent);
+    margin-bottom: 12px;
+    font-size: 1.3em;
+}
+
+.welcome-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.welcome-box p {
+    margin-top: 8px;
+    color: var(--text-mid);
+}
+
+.notice {
+    font-size: 0.85em;
+    color: var(--text-light);
+    margin-top: 12px !important;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+}
+
+.recent-posts {
+    margin-bottom: 30px;
+}
+
+.posts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.post-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 1px 4px var(--shadow);
+}
+
+.post-card h3 {
+    font-size: 1.05em;
+    color: var(--pink-accent);
+    margin-bottom: 6px;
+}
+
+.post-card .post-body {
+    color: var(--text-mid);
+    font-size: 0.95em;
+}
+
+.post-card .post-meta {
+    font-size: 0.8em;
+    color: var(--text-light);
+    margin-top: 8px;
+}
+
+.empty-state {
+    color: var(--text-light);
+    font-style: italic;
+    text-align: center;
+    padding: 30px;
+    background: var(--white);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+}
+
+footer {
+    text-align: center;
+    padding: 30px 0;
+    color: var(--text-light);
+    font-size: 0.85em;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+}
+
+/* Diary & Board pages */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn {
+    display: inline-block;
+    background: var(--pink-accent);
+    color: var(--white);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.btn:hover {
+    background: var(--pink-dark);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--pink-accent);
+    border: 1px solid var(--pink-accent);
+}
+
+.btn-secondary:hover {
+    background: var(--pink-accent);
+    color: var(--white);
+}
+
+/* Post form modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(74, 51, 71, 0.5);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+.modal h2 {
+    margin-bottom: 16px;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85em;
+    color: var(--text-mid);
+    margin-bottom: 4px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-family: inherit;
+    background: var(--pink-light);
+    color: var(--text-dark);
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 18px;
+}
+
+/* Comments */
+.comments-section {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+}
+
+.comments-section h4 {
+    font-size: 0.85em;
+    color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.comment {
+    background: var(--pink-light);
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.comment .comment-meta {
+    font-size: 0.75em;
+    color: var(--text-light);
+    margin-bottom: 4px;
+}
+
+.comment-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.comment-form input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85em;
+    background: var(--white);
+    font-family: inherit;
+}
+
+.comment-form button {
+    padding: 8px 16px;
+    background: var(--pink-dark);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+/* Tags */
+.tag {
+    display: inline-block;
+    background: var(--pink-mid);
+    color: var(--text-mid);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    margin-right: 6px;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    .container {
+        padding: 12px;
+    }
+    header h1 {
+        font-size: 1.5em;
+    }
+    .modal {
+        padding: 20px;
+    }
+}

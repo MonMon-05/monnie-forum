@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diary — Monnie's Forum</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Monnie's Forum</h1>
+            <p class="tagline">a quiet place on the internet</p>
+        </header>
+
+        <nav>
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="diary.html" class="nav-link active">Diary</a>
+            <a href="board.html" class="nav-link">Board</a>
+        </nav>
+
+        <main>
+            <div class="section-header">
+                <h2>Diary</h2>
+                <button class="btn" onclick="openDiaryModal()">New Entry</button>
+            </div>
+
+            <div id="diary-list" class="posts-container">
+                <p class="empty-state">No diary entries yet. Start writing.</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Monnie's Forum &copy; 2026 &mdash; made with care</p>
+        </footer>
+    </div>
+
+    <div class="modal-overlay" id="diary-modal">
+        <div class="modal">
+            <h2>New Diary Entry</h2>
+            <div class="form-group">
+                <label for="diary-title">Title</label>
+                <input type="text" id="diary-title" placeholder="What's on your mind?">
+            </div>
+            <div class="form-group">
+                <label for="diary-entry">Entry</label>
+                <textarea id="diary-entry" placeholder="Write your thoughts here..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="diary-author">Your name (or stay anonymous)</label>
+                <input type="text" id="diary-author" placeholder="Anonymous">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeDiaryModal()">Cancel</button>
+                <button class="btn" onclick="saveDiaryEntry()">Save Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', loadDiaryEntries);
+
+        function openDiaryModal() {
+            document.getElementById('diary-modal').classList.add('open');
+        }
+
+        function closeDiaryModal() {
+            document.getElementById('diary-modal').classList.remove('open');
+            document.getElementById('diary-title').value = '';
+            document.getElementById('diary-entry').value = '';
+            document.getElementById('diary-author').value = '';
+        }
+
+        async function saveDiaryEntry() {
+            const title = document.getElementById('diary-title').value.trim();
+            const entry = document.getElementById('diary-entry').value.trim();
+            const author = document.getElementById('diary-author').value.trim() || 'Anonymous';
+
+            if (!title || !entry) return alert('Please fill in the title and entry.');
+
+            const entries = await fetchBin(CONFIG.diaryBinId);
+            entries.unshift({
+                id: Date.now(),
+                title,
+                entry,
+                author,
+                date: new Date().toLocaleString(),
+                comments: []
+            });
+            await saveBin(CONFIG.diaryBinId, entries);
+            closeDiaryModal();
+            loadDiaryEntries();
+        }
+
+        async function loadDiaryEntries() {
+            const entries = await fetchBin(CONFIG.diaryBinId);
+            const container = document.getElementById('diary-list');
+
+            if (entries.length === 0) {
+                container.innerHTML = '<p class="empty-state">No diary entries yet. Start writing.</p>';
+                return;
+            }
+
+            container.innerHTML = entries.map(e => `
+                <div class="post-card">
+                    <h3>${escapeHtml(e.title)}</h3>
+                    <p class="post-body">${escapeHtml(e.entry)}</p>
+                    <p class="post-meta">${escapeHtml(e.author)} &mdash; ${e.date}</p>
+                    ${renderComments(e.id, e.comments, 'diary', loadDiaryEntries)}
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

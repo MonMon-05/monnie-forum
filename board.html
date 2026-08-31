@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board — Monnie's Forum</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Monnie's Forum</h1>
+            <p class="tagline">a quiet place on the internet</p>
+        </header>
+
+        <nav>
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="diary.html" class="nav-link">Diary</a>
+            <a href="board.html" class="nav-link active">Board</a>
+        </nav>
+
+        <main>
+            <div class="section-header">
+                <h2>Board</h2>
+                <button class="btn" onclick="openPostModal()">New Post</button>
+            </div>
+
+            <div id="board-list" class="posts-container">
+                <p class="empty-state">Nothing here yet. Start a conversation.</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Monnie's Forum &copy; 2026 &mdash; made with care</p>
+        </footer>
+    </div>
+
+    <div class="modal-overlay" id="post-modal">
+        <div class="modal">
+            <h2>New Post</h2>
+            <div class="form-group">
+                <label for="post-title">Title</label>
+                <input type="text" id="post-title" placeholder="Give your post a title">
+            </div>
+            <div class="form-group">
+                <label for="post-body">Content</label>
+                <textarea id="post-body" placeholder="What do you want to say?"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="post-author">Your name (or stay anonymous)</label>
+                <input type="text" id="post-author" placeholder="Anonymous">
+            </div>
+            <div class="form-group">
+                <label for="post-tag">Tag (optional)</label>
+                <input type="text" id="post-tag" placeholder="e.g. thoughts, art, question">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closePostModal()">Cancel</button>
+                <button class="btn" onclick="savePost()">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', loadBoardPosts);
+
+        function openPostModal() {
+            document.getElementById('post-modal').classList.add('open');
+        }
+
+        function closePostModal() {
+            document.getElementById('post-modal').classList.remove('open');
+            document.getElementById('post-title').value = '';
+            document.getElementById('post-body').value = '';
+            document.getElementById('post-author').value = '';
+            document.getElementById('post-tag').value = '';
+        }
+
+        async function savePost() {
+            const title = document.getElementById('post-title').value.trim();
+            const body = document.getElementById('post-body').value.trim();
+            const author = document.getElementById('post-author').value.trim() || 'Anonymous';
+            const tag = document.getElementById('post-tag').value.trim();
+
+            if (!title || !body) return alert('Please fill in the title and content.');
+
+            const posts = await fetchBin(CONFIG.boardBinId);
+            posts.unshift({
+                id: Date.now(),
+                title,
+                body,
+                author,
+                tag,
+                date: new Date().toLocaleString(),
+                comments: []
+            });
+            await saveBin(CONFIG.boardBinId, posts);
+            closePostModal();
+            loadBoardPosts();
+        }
+
+        async function loadBoardPosts() {
+            const posts = await fetchBin(CONFIG.boardBinId);
+            const container = document.getElementById('board-list');
+
+            if (posts.length === 0) {
+                container.innerHTML = '<p class="empty-state">Nothing here yet. Start a conversation.</p>';
+                return;
+            }
+
+            container.innerHTML = posts.map(p => `
+                <div class="post-card">
+                    <h3>${escapeHtml(p.title)}</h3>
+                    ${p.tag ? `<span class="tag">${escapeHtml(p.tag)}</span>` : ''}
+                    <p class="post-body">${escapeHtml(p.body)}</p>
+                    <p class="post-meta">${escapeHtml(p.author)} &mdash; ${p.date}</p>
+                    ${renderComments(p.id, p.comments, 'board', loadBoardPosts)}
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
