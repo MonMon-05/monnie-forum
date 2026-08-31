@@ -72,6 +72,13 @@ nav {
     color: var(--text-light);
 }
 
+.posting-as {
+    font-size: 0.85em;
+    color: var(--text-light);
+    font-style: italic;
+    margin-top: 4px;
+}
+
 .nav-link {
     text-decoration: none;
     color: var(--text-mid);

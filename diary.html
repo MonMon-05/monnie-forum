@@ -48,10 +48,7 @@
                 <label for="diary-entry">Entry</label>
                 <textarea id="diary-entry" placeholder="Write your thoughts here..."></textarea>
             </div>
-            <div class="form-group">
-                <label for="diary-author">Your name (or stay anonymous)</label>
-                <input type="text" id="diary-author" placeholder="Anonymous">
-            </div>
+            <p class="posting-as" id="diary-as">Posting as Anonymous</p>
             <div class="form-actions">
                 <button class="btn btn-secondary" onclick="closeDiaryModal()">Cancel</button>
                 <button class="btn" onclick="saveDiaryEntry()">Save Entry</button>
@@ -74,19 +71,21 @@
 
         function openDiaryModal() {
             document.getElementById('diary-modal').classList.add('open');
+            const user = getCurrentUser();
+            document.getElementById('diary-as').textContent = user ? `Posting as ${user.username}` : 'Posting as Anonymous';
         }
 
         function closeDiaryModal() {
             document.getElementById('diary-modal').classList.remove('open');
             document.getElementById('diary-title').value = '';
             document.getElementById('diary-entry').value = '';
-            document.getElementById('diary-author').value = '';
         }
 
         async function saveDiaryEntry() {
             const title = document.getElementById('diary-title').value.trim();
             const entry = document.getElementById('diary-entry').value.trim();
-            const author = document.getElementById('diary-author').value.trim() || 'Anonymous';
+            const user = getCurrentUser();
+            const author = user ? user.username : 'Anonymous';
 
             if (!title || !entry) return alert('Please fill in the title and entry.');
 
