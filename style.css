@@ -424,12 +424,14 @@ footer {
     box-shadow: 0 2px 10px var(--shadow);
     font-size: 0.85em;
     z-index: 50;
+    max-width: 280px;
 }
 
 .contact-widget a {
     color: var(--pink-accent);
     text-decoration: none;
     display: block;
+    margin-bottom: 4px;
 }
 
 .contact-widget a:hover {
@@ -442,6 +444,7 @@ footer {
     cursor: pointer;
     word-break: break-all;
     padding: 4px 0;
+    margin-bottom: 4px;
 }
 
 .donation-address:hover {
