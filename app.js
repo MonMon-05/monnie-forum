@@ -76,6 +76,17 @@ async function addComment(postId, section, loadFn) {
     loadFn();
 }
 
+async function deleteComment(postId, commentId, section, loadFn) {
+    if (!confirm('Delete this comment?')) return;
+    const binId = section === 'diary' ? CONFIG.diaryBinId : CONFIG.boardBinId;
+    const items = await fetchBin(binId);
+    const item = items.find(i => i.id === postId);
+    if (!item) return;
+    item.comments = item.comments.filter(c => c.id !== commentId);
+    await saveBin(binId, items);
+    loadFn();
+}
+
 function renderComments(postId, comments, section, loadFn) {
     const fnName = loadFn.name;
     if (!comments || comments.length === 0) {
@@ -92,7 +103,10 @@ function renderComments(postId, comments, section, loadFn) {
 
     const commentsHtml = comments.map(c => `
         <div class="comment">
-            <div class="comment-meta">${escapeHtml(c.author)} &mdash; ${c.date}</div>
+            <div class="comment-header">
+                <div class="comment-meta">${escapeHtml(c.author)} &mdash; ${c.date}</div>
+                <button class="delete-comment-btn" onclick="deleteComment(${postId},${c.id},'${section}',${fnName})">x</button>
+            </div>
             <div>${escapeHtml(c.text)}</div>
         </div>
     `).join('');

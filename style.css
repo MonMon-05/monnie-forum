@@ -316,6 +316,28 @@ footer {
     margin-bottom: 4px;
 }
 
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.delete-comment-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.delete-comment-btn:hover {
+    color: #e53935;
+}
+
 .comment-form {
     display: flex;
     gap: 8px;
