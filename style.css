@@ -429,9 +429,22 @@ footer {
 .contact-widget a {
     color: var(--pink-accent);
     text-decoration: none;
+    display: block;
 }
 
 .contact-widget a:hover {
+    text-decoration: underline;
+}
+
+.donation-address {
+    font-size: 0.75em;
+    color: var(--pink-accent);
+    cursor: pointer;
+    word-break: break-all;
+    padding: 4px 0;
+}
+
+.donation-address:hover {
     text-decoration: underline;
 }
 
