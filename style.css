@@ -127,10 +127,31 @@ h2 {
     box-shadow: 0 1px 4px var(--shadow);
 }
 
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+}
+
 .post-card h3 {
     font-size: 1.05em;
     color: var(--pink-accent);
-    margin-bottom: 6px;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.delete-btn:hover {
+    color: #e53935;
 }
 
 .post-card .post-body {
@@ -343,4 +364,34 @@ footer {
     .modal {
         padding: 20px;
     }
+}
+
+/* Contact widget */
+.contact-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 18px;
+    box-shadow: 0 2px 10px var(--shadow);
+    font-size: 0.85em;
+    z-index: 50;
+}
+
+.contact-widget a {
+    color: var(--pink-accent);
+    text-decoration: none;
+}
+
+.contact-widget a:hover {
+    text-decoration: underline;
+}
+
+.contact-label {
+    color: var(--text-light);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.8em;
 }

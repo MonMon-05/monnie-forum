@@ -57,6 +57,11 @@
         </div>
     </div>
 
+    <div class="contact-widget">
+        <span class="contact-label">Stay in contact with me</span>
+        <a href="mailto:monnie20@proton.me">monnie20@proton.me</a>
+    </div>
+
     <script src="app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', loadDiaryEntries);
@@ -93,6 +98,14 @@
             loadDiaryEntries();
         }
 
+        async function deleteDiaryEntry(postId) {
+            if (!confirm('Delete this entry?')) return;
+            const entries = await fetchBin(CONFIG.diaryBinId);
+            const filtered = entries.filter(e => e.id !== postId);
+            await saveBin(CONFIG.diaryBinId, filtered);
+            loadDiaryEntries();
+        }
+
         async function loadDiaryEntries() {
             const entries = await fetchBin(CONFIG.diaryBinId);
             const container = document.getElementById('diary-list');
@@ -104,7 +117,10 @@
 
             container.innerHTML = entries.map(e => `
                 <div class="post-card">
-                    <h3>${escapeHtml(e.title)}</h3>
+                    <div class="post-header">
+                        <h3>${escapeHtml(e.title)}</h3>
+                        <button class="delete-btn" onclick="deleteDiaryEntry(${e.id})">x</button>
+                    </div>
                     <p class="post-body">${escapeHtml(e.entry)}</p>
                     <p class="post-meta">${escapeHtml(e.author)} &mdash; ${e.date}</p>
                     ${renderComments(e.id, e.comments, 'diary', loadDiaryEntries)}
