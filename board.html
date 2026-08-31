@@ -17,6 +17,7 @@
             <a href="index.html" class="nav-link">Home</a>
             <a href="diary.html" class="nav-link">Diary</a>
             <a href="board.html" class="nav-link active">Board</a>
+            <span id="admin-btn"></span>
         </nav>
 
         <main>
@@ -68,6 +69,7 @@
 
     <script src="app.js"></script>
     <script>
+        document.getElementById('admin-btn').innerHTML = renderAdminButton();
         document.addEventListener('DOMContentLoaded', loadBoardPosts);
 
         function openPostModal() {

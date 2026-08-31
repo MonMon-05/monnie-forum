@@ -17,6 +17,7 @@
             <a href="index.html" class="nav-link">Home</a>
             <a href="diary.html" class="nav-link active">Diary</a>
             <a href="board.html" class="nav-link">Board</a>
+            <span id="admin-btn"></span>
         </nav>
 
         <main>
@@ -64,6 +65,7 @@
 
     <script src="app.js"></script>
     <script>
+        document.getElementById('admin-btn').innerHTML = renderAdminButton();
         document.addEventListener('DOMContentLoaded', loadDiaryEntries);
 
         function openDiaryModal() {
@@ -99,6 +101,7 @@
         }
 
         async function deleteDiaryEntry(postId) {
+            if (!isAdmin()) return alert('Admin only.');
             if (!confirm('Delete this entry?')) return;
             const entries = await fetchBin(CONFIG.diaryBinId);
             const filtered = entries.filter(e => e.id !== postId);
@@ -119,7 +122,7 @@
                 <div class="post-card">
                     <div class="post-header">
                         <h3>${escapeHtml(e.title)}</h3>
-                        <button class="delete-btn" onclick="deleteDiaryEntry(${e.id})">x</button>
+                        ${isAdmin() ? `<button class="delete-btn" onclick="deleteDiaryEntry(${e.id})">x</button>` : ''}
                     </div>
                     <p class="post-body">${escapeHtml(e.entry)}</p>
                     <p class="post-meta">${escapeHtml(e.author)} &mdash; ${e.date}</p>

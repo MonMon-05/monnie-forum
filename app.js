@@ -5,7 +5,8 @@
 const CONFIG = {
     apiKey: '$2a$10$eO.Jn4FLv0JFSaPV29dC7e1wM4WzWQGkhzj7PLZasxiGYhrxzOE7m',
     diaryBinId: '6a95b16fda38895dfe2712ed',
-    boardBinId: '6a95b179f5f4af5e29589fa6'
+    boardBinId: '6a95b179f5f4af5e29589fa6',
+    adminPassword: 'monnie20'
 };
 // ============================================================
 
@@ -52,6 +53,34 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// ---- Admin ----
+
+function isAdmin() {
+    return sessionStorage.getItem('monnie-admin') === 'true';
+}
+
+function adminLogin() {
+    const pw = prompt('Enter admin password:');
+    if (pw === CONFIG.adminPassword) {
+        sessionStorage.setItem('monnie-admin', 'true');
+        location.reload();
+    } else if (pw !== null) {
+        alert('Wrong password.');
+    }
+}
+
+function adminLogout() {
+    sessionStorage.removeItem('monnie-admin');
+    location.reload();
+}
+
+function renderAdminButton() {
+    if (isAdmin()) {
+        return `<button class="btn btn-secondary btn-sm" onclick="adminLogout()">Log out admin</button>`;
+    }
+    return `<button class="btn btn-secondary btn-sm" onclick="adminLogin()">Admin</button>`;
+}
+
 // ---- Comments (shared by diary & board) ----
 
 async function addComment(postId, section, loadFn) {
@@ -77,6 +106,7 @@ async function addComment(postId, section, loadFn) {
 }
 
 async function deleteComment(postId, commentId, section, loadFn) {
+    if (!isAdmin()) return alert('Admin only.');
     if (!confirm('Delete this comment?')) return;
     const binId = section === 'diary' ? CONFIG.diaryBinId : CONFIG.boardBinId;
     const items = await fetchBin(binId);
@@ -105,7 +135,7 @@ function renderComments(postId, comments, section, loadFn) {
         <div class="comment">
             <div class="comment-header">
                 <div class="comment-meta">${escapeHtml(c.author)} &mdash; ${c.date}</div>
-                <button class="delete-comment-btn" onclick="deleteComment(${postId},${c.id},'${section}',${fnName})">x</button>
+                ${isAdmin() ? `<button class="delete-comment-btn" onclick="deleteComment(${postId},${c.id},'${section}',${fnName})">x</button>` : ''}
             </div>
             <div>${escapeHtml(c.text)}</div>
         </div>
