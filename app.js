@@ -6,7 +6,7 @@ const CONFIG = {
     apiKey: '$2a$10$eO.Jn4FLv0JFSaPV29dC7e1wM4WzWQGkhzj7PLZasxiGYhrxzOE7m',
     diaryBinId: '6a95b16fda38895dfe2712ed',
     boardBinId: '6a95b179f5f4af5e29589fa6',
-    adminPassword: 'monnie20'
+    adminPassword: 'ILoveAnime!2200'
 };
 // ============================================================
 
