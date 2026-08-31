@@ -61,6 +61,17 @@ nav {
     align-items: center;
 }
 
+.user-greeting {
+    color: var(--pink-accent);
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.comment-as {
+    font-size: 0.8em;
+    color: var(--text-light);
+}
+
 .nav-link {
     text-decoration: none;
     color: var(--text-mid);

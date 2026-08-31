@@ -1,11 +1,11 @@
 // ============================================================
-// CONFIG — Replace these with your JSONBin.io credentials
-// Sign up at https://jsonbin.io, create a bin, and paste here
+// CONFIG
 // ============================================================
 const CONFIG = {
     apiKey: '$2a$10$eO.Jn4FLv0JFSaPV29dC7e1wM4WzWQGkhzj7PLZasxiGYhrxzOE7m',
     diaryBinId: '6a95b16fda38895dfe2712ed',
     boardBinId: '6a95b179f5f4af5e29589fa6',
+    usersBinId: '6a95e670da38895dfe27ef2d',
     adminPassword: 'ILoveAnime!2200'
 };
 // ============================================================
@@ -53,6 +53,64 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// ---- Password Hashing ----
+
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ---- User System ----
+
+function getCurrentUser() {
+    const stored = sessionStorage.getItem('monnie-user');
+    return stored ? JSON.parse(stored) : null;
+}
+
+function setCurrentUser(user) {
+    sessionStorage.setItem('monnie-user', JSON.stringify(user));
+}
+
+function logoutUser() {
+    sessionStorage.removeItem('monnie-user');
+    location.reload();
+}
+
+async function signup(username, password) {
+    if (!username || !password) return alert('Please fill in both fields.');
+    if (username.length < 2) return alert('Username must be at least 2 characters.');
+    if (password.length < 4) return alert('Password must be at least 4 characters.');
+
+    const users = await fetchBin(CONFIG.usersBinId);
+    if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+        return alert('That username is already taken.');
+    }
+
+    const hashed = await hashPassword(password);
+    const newUser = { username, password: hashed, isOwner: false };
+    users.push(newUser);
+    await saveBin(CONFIG.usersBinId, users);
+
+    setCurrentUser({ username, isOwner: false });
+    location.reload();
+}
+
+async function loginUser(username, password) {
+    if (!username || !password) return alert('Please fill in both fields.');
+
+    const users = await fetchBin(CONFIG.usersBinId);
+    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+    if (!user) return alert('User not found.');
+
+    const hashed = await hashPassword(password);
+    if (user.password !== hashed) return alert('Wrong password.');
+
+    setCurrentUser({ username: user.username, isOwner: user.isOwner || false });
+    location.reload();
+}
+
 // ---- Admin ----
 
 function isAdmin() {
@@ -74,19 +132,97 @@ function adminLogout() {
     location.reload();
 }
 
+// ---- UI Rendering ----
+
+function renderAuthButtons() {
+    const user = getCurrentUser();
+    if (user) {
+        return `
+            <span class="user-greeting">Hi, ${escapeHtml(user.username)}</span>
+            <button class="btn btn-secondary btn-sm" onclick="logoutUser()">Log out</button>
+        `;
+    }
+    return `
+        <button class="btn btn-secondary btn-sm" onclick="openLoginModal()">Log in</button>
+        <button class="btn btn-sm" onclick="openSignupModal()">Sign up</button>
+    `;
+}
+
 function renderAdminButton() {
     if (isAdmin()) {
-        return `<button class="btn btn-secondary btn-sm" onclick="adminLogout()">Log out admin</button>`;
+        return `<button class="btn btn-secondary btn-sm" onclick="adminLogout()">Admin off</button>`;
     }
     return `<button class="btn btn-secondary btn-sm" onclick="adminLogin()">Admin</button>`;
+}
+
+function renderAuthModalHTML() {
+    return `
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal">
+            <h2>Log in</h2>
+            <div class="form-group">
+                <label for="login-user">Username</label>
+                <input type="text" id="login-user" placeholder="Your username">
+            </div>
+            <div class="form-group">
+                <label for="login-pass">Password</label>
+                <input type="password" id="login-pass" placeholder="Your password">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeLoginModal()">Cancel</button>
+                <button class="btn" onclick="doLogin()">Log in</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="signup-modal">
+        <div class="modal">
+            <h2>Sign up</h2>
+            <div class="form-group">
+                <label for="signup-user">Choose a username</label>
+                <input type="text" id="signup-user" placeholder="Pick a unique username">
+            </div>
+            <div class="form-group">
+                <label for="signup-pass">Choose a password</label>
+                <input type="password" id="signup-pass" placeholder="At least 4 characters">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeSignupModal()">Cancel</button>
+                <button class="btn" onclick="doSignup()">Sign up</button>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function openLoginModal() { document.getElementById('login-modal').classList.add('open'); }
+function closeLoginModal() { document.getElementById('login-modal').classList.remove('open'); }
+function openSignupModal() { document.getElementById('signup-modal').classList.add('open'); }
+function closeSignupModal() { document.getElementById('signup-modal').classList.remove('open'); }
+
+async function doLogin() {
+    const username = document.getElementById('login-user').value.trim();
+    const password = document.getElementById('login-pass').value;
+    closeLoginModal();
+    await loginUser(username, password);
+}
+
+async function doSignup() {
+    const username = document.getElementById('signup-user').value.trim();
+    const password = document.getElementById('signup-pass').value;
+    closeSignupModal();
+    await signup(username, password);
 }
 
 // ---- Comments (shared by diary & board) ----
 
 async function addComment(postId, section, loadFn) {
-    const input = document.getElementById(`comment-input-${postId}`);
-    const text = input.value.trim();
+    const textInput = document.getElementById(`comment-input-${postId}`);
+    const text = textInput.value.trim();
     if (!text) return;
+
+    const user = getCurrentUser();
+    const name = user ? user.username : 'Anonymous';
 
     const binId = section === 'diary' ? CONFIG.diaryBinId : CONFIG.boardBinId;
     const items = await fetchBin(binId);
@@ -96,12 +232,12 @@ async function addComment(postId, section, loadFn) {
     item.comments.push({
         id: Date.now(),
         text,
-        author: 'Anonymous',
+        author: name,
         date: new Date().toLocaleString()
     });
 
     await saveBin(binId, items);
-    input.value = '';
+    textInput.value = '';
     loadFn();
 }
 
@@ -119,14 +255,24 @@ async function deleteComment(postId, commentId, section, loadFn) {
 
 function renderComments(postId, comments, section, loadFn) {
     const fnName = loadFn.name;
+    const user = getCurrentUser();
+
+    const commentInput = user
+        ? `<div class="comment-form">
+                <span class="comment-as">As ${escapeHtml(user.username)}</span>
+                <input type="text" id="comment-input-${postId}" placeholder="Write a comment..." onkeypress="if(event.key==='Enter')addComment(${postId},'${section}',${fnName})">
+                <button onclick="addComment(${postId},'${section}',${fnName})">Reply</button>
+           </div>`
+        : `<div class="comment-form">
+                <input type="text" id="comment-input-${postId}" placeholder="Log in to comment..." onkeypress="if(event.key==='Enter')addComment(${postId},'${section}',${fnName})">
+                <button onclick="addComment(${postId},'${section}',${fnName})">Reply</button>
+           </div>`;
+
     if (!comments || comments.length === 0) {
         return `
             <div class="comments-section">
                 <h4>Comments</h4>
-                <div class="comment-form">
-                    <input type="text" id="comment-input-${postId}" placeholder="Write a comment..." onkeypress="if(event.key==='Enter')addComment(${postId},'${section}',${fnName})">
-                    <button onclick="addComment(${postId},'${section}',${fnName})">Reply</button>
-                </div>
+                ${commentInput}
             </div>
         `;
     }
@@ -145,10 +291,7 @@ function renderComments(postId, comments, section, loadFn) {
         <div class="comments-section">
             <h4>Comments (${comments.length})</h4>
             ${commentsHtml}
-            <div class="comment-form">
-                <input type="text" id="comment-input-${postId}" placeholder="Write a comment..." onkeypress="if(event.key==='Enter')addComment(${postId},'${section}',${fnName})">
-                <button onclick="addComment(${postId},'${section}',${fnName})">Reply</button>
-            </div>
+            ${commentInput}
         </div>
     `;
 }

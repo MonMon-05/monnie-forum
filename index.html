@@ -17,6 +17,7 @@
             <a href="index.html" class="nav-link active">Home</a>
             <a href="diary.html" class="nav-link">Diary</a>
             <a href="board.html" class="nav-link">Board</a>
+            <span id="auth-btns"></span>
             <span id="admin-btn"></span>
         </nav>
 
@@ -46,6 +47,11 @@
     </div>
 
     <script src="app.js"></script>
-    <script>document.getElementById('admin-btn').innerHTML = renderAdminButton();</script>
+    <div id="auth-modals"></div>
+    <script>
+        document.getElementById('auth-btns').innerHTML = renderAuthButtons();
+        document.getElementById('admin-btn').innerHTML = renderAdminButton();
+        document.getElementById('auth-modals').innerHTML = renderAuthModalHTML();
+    </script>
 </body>
 </html>
